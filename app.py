@@ -1,12 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import ElementNotInteractableException
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
-import time
-import json
-
+import time, json, os
+from bottle import route, template, run
+from threading import *
 
 chrome_options = webdriver.chrome.options.Options()
 chrome_options.add_argument("--disable-extensions")
@@ -75,11 +73,34 @@ def sniff():
             # Write json file 
             with open('last_transaction.json', 'w') as f:
                 f.write(json.dumps(lt.info_dict))
-
         time.sleep(1)
 
 
+@route('/')
+def index():
+    try:
+        with open('last_transaction.json', 'r') as f:
+            lt = json.loads(f.read())
+            sender = lt['sender']
+            amount = lt['amount']
+            remarks = lt['remarks']
+        os.remove('last_transaction.json')
+    except:
+        sender = ''
+        amount = ''
+        remarks = ''
+    return template('index.html', sender=sender, amount=amount, remarks=remarks)
+    
+
+def server():
+    run(host='localhost', port=8000)
+
+
+th_server = Thread(target=server)
+
+
 if __name__ == '__main__':
+    th_server.start()
     login(username, password)
     sniff()
 
