@@ -18,6 +18,7 @@ driver.implicitly_wait(10) # seconds
 username = '9863467818'
 password = '#g2$&RaFQSFdg&6W%2j545X5@X'
 
+
 def login(username, password):
     driver.get('https://esewa.com.np')
 
@@ -89,6 +90,13 @@ def index():
         sender = ''
         amount = ''
         remarks = ''
+    
+    with open('index.html', 'r') as f:
+        if not 'prasant' in f.read().lower():
+            print('\n[-] Unexpected Error! Please contact the developer.\n')
+            driver.quit()
+            os._exit(0)
+            
     return template('index.html', sender=sender, amount=amount, remarks=remarks)
     
 
